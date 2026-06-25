@@ -12,7 +12,7 @@ app.use(cors());
 app.use(express.json());
 
 
-const uri = `mongodb://${process.env.DB_USER}:${process.env.DB_PASS}@ac-mk4quir-shard-00-00.8gsm7ez.mongodb.net:27017,ac-mk4quir-shard-00-01.8gsm7ez.mongodb.net:27017,ac-mk4quir-shard-00-02.8gsm7ez.mongodb.net:27017/?ssl=true&replicaSet=atlas-2qwr4j-shard-0&authSource=admin&appName=Cluster0`;
+const uri = `mongodb://${process.env.DB_USER}:${process.env.DB_PASS}@ac-xdtfxsh-shard-00-00.0zmykqn.mongodb.net:27017,ac-xdtfxsh-shard-00-01.0zmykqn.mongodb.net:27017,ac-xdtfxsh-shard-00-02.0zmykqn.mongodb.net:27017/?ssl=true&replicaSet=atlas-esirnl-shard-0&authSource=admin&appName=Cluster0`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -28,7 +28,7 @@ const run = async () => {
         // Connect the client to the server
         await client.connect();
 
-        const db = client.db('CRUD-1');
+        const db = client.db('simpleCrud');
         const usersCollection = db.collection('users');
 
         app.get('/users', async (req, res) => {
@@ -42,6 +42,13 @@ const run = async () => {
             const query = { _id: new ObjectId(id) };
             const user = await usersCollection.findOne(query);
             res.send(user);
+        })
+
+        app.delete('/users/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const result = await usersCollection.deleteOne(query);
+            res.send(result);
         })
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
