@@ -3,7 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const app = express();
 const cors = require('cors');
-const { MongoClient, ServerApiVersion, ServerDescription } = require('mongodb');
+const { MongoClient, ServerApiVersion, ServerDescription, ObjectId } = require('mongodb');
 const port = process.env.PORT || 5000;
 
 
@@ -35,6 +35,13 @@ const run = async () => {
             const cursor = usersCollection.find({});
             const result = await cursor.toArray();
             res.send(result);
+        })
+
+        app.get('/users/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const user = await usersCollection.findOne(query);
+            res.send(user);
         })
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
