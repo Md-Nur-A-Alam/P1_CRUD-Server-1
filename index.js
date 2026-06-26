@@ -39,16 +39,38 @@ const run = async () => {
 
         app.get('/users/:id', async (req, res) => {
             const id = req.params.id;
-            const query = { _id: new ObjectId(id) };
-            const user = await usersCollection.findOne(query);
-            res.send(user);
+            if (!ObjectId.isValid(id)) {
+                return res.status(400).send({ error: "Invalid user ID format" });
+            }
+            try {
+                const query = { _id: new ObjectId(id) };
+                const user = await usersCollection.findOne(query);
+                if (!user) {
+                    return res.status(404).send({ error: "User not found" });
+                }
+                res.send(user);
+            } catch (error) {
+                console.error("Error in GET /users/:id:", error);
+                res.status(500).send({ error: "Internal server error" });
+            }
         })
 
         app.delete('/users/:id', async (req, res) => {
             const id = req.params.id;
-            const query = { _id: new ObjectId(id) }
-            const result = await usersCollection.deleteOne(query);
-            res.send(result);
+            if (!ObjectId.isValid(id)) {
+                return res.status(400).send({ error: "Invalid user ID format" });
+            }
+            try {
+                const query = { _id: new ObjectId(id) };
+                const result = await usersCollection.deleteOne(query);
+                if (result.deletedCount === 0) {
+                    return res.status(404).send({ error: "User not found" });
+                }
+                res.send(result);
+            } catch (error) {
+                console.error("Error in DELETE /users/:id:", error);
+                res.status(500).send({ error: "Internal server error" });
+            }
         })
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
