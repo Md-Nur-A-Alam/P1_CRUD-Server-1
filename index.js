@@ -79,6 +79,27 @@ const run = async () => {
                 res.status(500).send({ error: "Internal server error" });
             }
         })
+
+        app.patch('/users/:id', async (req, res) => {
+            const id = req.params.id;
+            if (!ObjectId.isValid(id)) {
+                return res.status(400).send({ error: "Invalid user ID format" });
+            }
+            try {
+                const query = { _id: new ObjectId(id) };
+                const updateDoc = {
+                    $set: req.body
+                };
+                const result = await usersCollection.updateOne(query, updateDoc);
+                if (result.matchedCount === 0) {
+                    return res.status(404).send({ error: "User not found" });
+                }
+                res.send(result);
+            } catch (error) {
+                console.error("Error in PATCH /users/:id:", error);
+                res.status(500).send({ error: "Internal server error" });
+            }
+        })
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");

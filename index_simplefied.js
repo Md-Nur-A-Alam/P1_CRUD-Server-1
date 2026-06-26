@@ -55,6 +55,16 @@ async function run() {
         });
         res.send(result);
     });
+
+    // Update user
+    app.patch('/users/:id', async (req, res) => {
+        const id = req.params.id;
+        const result = await usersCollection.updateOne(
+            { _id: new ObjectId(id) },
+            { $set: req.body }
+        );
+        res.send(result);
+    });
 }
 
 run();
